@@ -1,4 +1,31 @@
-Generates a buy/sell signal when bid/ask volume imbalance exceeds +- 2.4x the other
-Operates over BTC/USDT
-Real time data is rich - provided by Binance
-Position is closed when the reverse signal is triggered, otherwise held
+Overview
+Type: Market Microstructure / Order Flow
+Asset(s): BTCUSDT (Crypto)
+Timeframe: Tick
+Style: Intraday / High-frequency
+This strategy exploits short-term price movements in BTC/USDT by monitoring top-of-book quote imbalance on Binance tick data. It generates trade signals when the bid/ask volume skew exceeds a defined threshold and manages trades with a cooldown period to avoid overtrading.
+
+Parameters
+Instrument: BTCUSDT (Binance)
+Resolution: Tick
+Imbalance Threshold: ±0.4
+Position Size: 0.02 BTC (~$1,250 at $62K)
+Cooldown Period: 5 minutes between trades
+Note on Imbalance Calculation:
+The imbalance is calculated as (bidSize - askSize) / (bidSize + askSize), resulting in a value between -1 and +1.
+A threshold of +0.4 means bids must be ~2.4× larger than offers to trigger a buy signal.
+Similarly, -0.4 means offers must be ~2.4× larger than bids to trigger a sell signal.
+Strategy Logic
+Signal Generation
+For each tick quote:
+Compute imbalance = (bidSize - askSize) / (bidSize + askSize)
+Enter long if imbalance > 0.4
+Exit if imbalance < -0.4
+Signal ignored if cooldown period hasn’t passed
+Risk Management
+Only one active position at a time
+Position size is fixed (aggressive relative to portfolio size)
+Trade frequency controlled via cooldown logic
+Exit Logic
+Exit position when opposite signal is triggered
+Automatically logs and tracks trade activity
